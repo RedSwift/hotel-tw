@@ -4,10 +4,10 @@ let Lakewood = {
   rating: 3,
   regular: {
     weekday: 110,
-    weekend: 80
+    weekend: 90
   },
   loyal: {
-    weekday: 90,
+    weekday: 80,
     weekend: 80
   }
 }
@@ -17,10 +17,10 @@ let Bridgewood = {
   rating: 4,
   regular: {
     weekday: 160,
-    weekend: 110
+    weekend: 60
   },
   loyal: {
-    weekday: 60,
+    weekday: 110,
     weekend: 50
   }
 }
@@ -30,39 +30,46 @@ let Ridgewood = {
   rating: 5,
   regular: {
     weekday: 220,
-    weekend: 100
+    weekend: 150
   },
   loyal: {
-    weekday: 150,
+    weekday: 100,
     weekend: 40
   }
 }
 
 let hotelArray = [Lakewood, Bridgewood, Ridgewood]
 
+// logic
 class Hotel {
-  constructor (type, date1, date2, date3) {
-    this.type = type
-    this.date1 = date1
-    this.date2 = date2
-    this.date3 = date3
-  }
-
-  isCheapest () {
-    let cheapest = hotelArray[0]
-    if (this.type === 'regular') {
-      for (let i = 1; i < hotelArray.length; i++) {
-        if (cheapest.regular.weekday > hotelArray[i].regular.weekday) cheapest = hotelArray[i]
-        return cheapest.name
+  isCheapest (type, dates) {
+    let cheapest = null
+    let cheapestPrice = Infinity
+    let cheapestRating = null
+    hotelArray.forEach((hotel) => {
+      let price = dates.reduce((acc, day) => {
+        return acc + hotel[type][day]
+      }, 0)
+      if (price < cheapestPrice || (price === cheapestPrice && hotel.rating > cheapestRating)) {
+        cheapestPrice = price
+        cheapestRating = hotel.rating
+        cheapest = hotel.name
       }
-    }
-    if (this.type === 'loyal') {
-      for (let i = 1; i < hotelArray.length; i++) {
-        if (cheapest.loyal.weekday > hotelArray[i].loyal.weekday) cheapest = hotelArray[i]
-        return cheapest.name
-      }
-    }
+    })
+    return cheapest
   }
 }
 
-module.exports = Hotel
+function changeDate (date) {
+  let day = new Date(date).getDay()
+  if (day === 0 || day === 6) return 'weekend'
+  return 'weekday'
+}
+
+module.exports = {
+  Hotel: Hotel,
+  changeDate: changeDate
+}
+
+// split into methods && test them
+// make whole class into immutable state
